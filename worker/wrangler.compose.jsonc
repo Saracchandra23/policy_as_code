@@ -1,0 +1,32 @@
+{
+  "name": "cf-ai-policy-as-code-compose",
+  "main": "src/delivery/index.ts",
+  "compatibility_date": "2026-11-01",
+  "ai": {
+    "binding": "AI"
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "POLICY_DO",
+        "class_name": "PolicyEngineDO"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["PolicyEngineDO"]
+    }
+  ],
+  "workflows": [
+    {
+      "name": "policy-authoring-workflow",
+      "binding": "POLICY_WORKFLOW",
+      "class_name": "PolicyAuthoringWorkflow"
+    }
+  ],
+  "vars": {
+    "OPA_SERVICE_URL": "http://127.0.0.1:8080"
+  }
+}

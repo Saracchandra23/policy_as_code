@@ -38,7 +38,7 @@ export class PolicyAuthoringWorkflow extends WorkflowEntrypoint<Env, PolicyAutho
 
     const initialValidation = await step.do("validate-with-opa", async () => {
       await policyStub.recordWorkflowProgress(workflowId, "validate-with-opa");
-      return this.services.pdp.validateRego(generated.regoCode);
+      return policyStub.validatePolicy(generated.regoCode);
     });
 
     const repaired = await step.do("auto-repair-if-invalid", async () => {
@@ -52,7 +52,7 @@ export class PolicyAuthoringWorkflow extends WorkflowEntrypoint<Env, PolicyAutho
         initialValidation.errors,
         prompt,
       );
-      const validation = await this.services.pdp.validateRego(repair.regoCode);
+      const validation = await policyStub.validatePolicy(repair.regoCode);
       return { ...repair, validation };
     });
 

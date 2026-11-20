@@ -4,13 +4,16 @@ import {
   ExplainDenialUseCase,
   GetControlPlaneStateUseCase,
 } from "../application/usecases";
+import { DurableObjectContainerPDPAdapter } from "../infrastructure/DurableObjectContainerPDPAdapter";
 import { HttpAuthZenPDPAdapter } from "../infrastructure/HttpAuthZenPDPAdapter";
 import { SqlitePolicyStorageAdapter } from "../infrastructure/SqlitePolicyStorageAdapter";
 import { WorkersAILlamaAdapter } from "../infrastructure/WorkersAILlamaAdapter";
 
-export function createContainer(env: Env, sql: SqlStorage) {
-  const storage = new SqlitePolicyStorageAdapter(sql);
-  const pdp = new HttpAuthZenPDPAdapter(env.OPA_SERVICE_URL);
+export function createContainer(env: Env, ctx: DurableObjectState) {
+  const storage = new SqlitePolicyStorageAdapter(ctx.storage.sql);
+  const pdp = ctx.container
+    ? new DurableObjectContainerPDPAdapter(ctx.container)
+    : new HttpAuthZenPDPAdapter(env.OPA_SERVICE_URL);
   const llm = new WorkersAILlamaAdapter(env.AI);
   return {
     storage,
@@ -23,13 +26,6 @@ export function createContainer(env: Env, sql: SqlStorage) {
   };
 }
 
-export function createGatewayContainer(env: Env) {
-  return { pdp: new HttpAuthZenPDPAdapter(env.OPA_SERVICE_URL) };
-}
-
 export function createWorkflowContainer(env: Env) {
-  return {
-    pdp: new HttpAuthZenPDPAdapter(env.OPA_SERVICE_URL),
-    llm: new WorkersAILlamaAdapter(env.AI),
-  };
+  return { llm: new WorkersAILlamaAdapter(env.AI) };
 }

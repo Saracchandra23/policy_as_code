@@ -18,15 +18,30 @@ export class PolicyEngineDO extends DurableObject<Env> {
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
     this.initialized = this.ctx.blockConcurrencyWhile(async () => {
-      this.container = createContainer(this.env, this.ctx.storage.sql);
+      this.container = createContainer(this.env, this.ctx);
       await this.container.storage.initSchema();
       await this.container.storage.seedDefaultPolicyIfEmpty(DEFAULT_AUTHZ_POLICY);
     });
   }
 
+  async evaluatePdp(request: AccessEvaluationRequest): Promise<AccessEvaluationResponse> {
+    await this.initialized;
+    return this.container.pdp.evaluate(request);
+  }
+
   async evaluatePep(request: AccessEvaluationRequest): Promise<AccessEvaluationResponse> {
     await this.initialized;
     return this.container.enforceAccess.execute(request);
+  }
+
+  async getPdpConfiguration() {
+    await this.initialized;
+    return this.container.pdp.getConfiguration();
+  }
+
+  async validatePolicy(regoCode: string) {
+    await this.initialized;
+    return this.container.pdp.validateRego(regoCode);
   }
 
   async getState(): Promise<ControlPlaneState> {

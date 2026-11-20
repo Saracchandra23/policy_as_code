@@ -31,4 +31,12 @@ Log major prompts used with VS Code Copilot / Ollama during development (require
 
 ## 8. Assignment Submission Finalization
 - Prompt: Finalize the Cloudflare assignment by adding an executable end-to-end smoke test for Go OPA health, AuthZEN, tarball ETags, Worker PEP/audit persistence, and policy hot reload; audit constructor DI and Rego v1 conventions; clean prompt traceability; and document the architecture, assignment-component mapping, three-terminal local startup, and Cloudflare deployment.
-- Added `/health`, extended seed policy coverage for report/workspace actions, added focused Go health and OPA decision tests, and created `scripts/smoke-test.sh`. Rewrote the root README with the requested architecture and operating instructions.
+- Added `/health`, extended seed policy coverage for report/workspace actions, added focused Go health and OPA decision tests, and documented the implementation. The standalone shell smoke script from this iteration was subsequently removed in favor of Playwright E2E coverage.
+
+## 9. Playwright, Dependency Governance, and Submission Documentation
+- Prompt: Finalize `cf_ai_policy_as_code` for Cloudflare fast-track submission without a `smoke-test.sh`: implement five Playwright E2E scenarios for AuthZEN discovery/health, PEP allow and deny with AI denial explanation, AI policy workflow validation/approval/hot bundle sync, and Durable Object state persistence; add weekly Renovate dependency and vulnerability management; add a production Go OPA Dockerfile; and document architecture, business use cases, scalability, production hardening, local testing, and deployment.
+- Added a service-managed Playwright suite with isolated Durable Object persistence, Renovate rules for Go/Worker/frontend/E2E packages, and a multi-stage OPA container. Replaced the submission README with architecture, operational limits, enterprise use cases, roadmap, and run/deploy instructions.
+
+## 10. Docker Compose and Cloudflare Containers
+- Prompt: Finalize the repository with root-context Docker Compose orchestration for OPA, the Wrangler Worker, and Vite; native Cloudflare Container support through a Durable Object PDP adapter with HTTP fallback; configurable Playwright E2E base URL; Renovate grouping including Docker images; and a submission-ready README with local and Cloudflare quickstarts.
+- Added three Docker image targets, a shared Compose network and persistent local Worker state, a Compose-specific Wrangler config, and the optional Container-backed PDP adapter. Routed AuthZEN, Workflow validation, and policy activation through the Durable Object PDP port; extended E2E service selection and updated architecture/quickstart documentation.

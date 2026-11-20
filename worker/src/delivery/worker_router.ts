@@ -1,4 +1,3 @@
-import { createGatewayContainer } from "../di/container";
 import type { AccessEvaluationRequest, AccessEvaluationResponse } from "../domain/authzen";
 import type { ChatMessage } from "../domain/policy";
 
@@ -28,15 +27,16 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
 async function routeRequest(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
   const pathname = url.pathname;
-  const gateway = createGatewayContainer(env);
 
   if (request.method === "GET" && pathname === "/.well-known/authzen-configuration") {
-    return jsonResponse(await gateway.pdp.getConfiguration());
+    return jsonResponse(
+      await policyEngineStub(env, "default").getPdpConfiguration(),
+    );
   }
   if (request.method === "POST" && pathname === "/access/v1/evaluation") {
     const body = await readJson<unknown>(request);
     assertAccessRequest(body);
-    return jsonResponse(await gateway.pdp.evaluate(body));
+    return jsonResponse(await policyEngineStub(env, "default").evaluatePdp(body));
   }
   if (request.method === "POST" && pathname === "/api/pep/enforce") {
     const body = await readJson<unknown>(request);

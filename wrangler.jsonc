@@ -27,6 +27,14 @@
       "class_name": "PolicyAuthoringWorkflow"
     }
   ],
+  "containers": [
+    {
+      "class_name": "PolicyEngineDO",
+      "image": "./opa-service/Dockerfile",
+      "instance_type": "lite",
+      "max_instances": 2
+    }
+  ],
   "vars": {
     "OPA_SERVICE_URL": "http://127.0.0.1:8080"
   }

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "timezone": "UTC",
+  "schedule": ["before 6am on Monday"],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security"],
+    "schedule": ["every monday"],
+    "timezone": "UTC"
+  },
+  "packageRules": [
+    {
+      "description": "Group weekly Go OPA minor and patch updates",
+      "matchManagers": ["gomod"],
+      "matchFileNames": ["opa-service/go.mod"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "Go OPA minor and patch"
+    },
+    {
+      "description": "Group weekly Cloudflare Worker minor and patch updates",
+      "matchManagers": ["npm"],
+      "matchFileNames": ["worker/package.json"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "Cloudflare Worker minor and patch"
+    },
+    {
+      "description": "Group weekly React frontend minor and patch updates",
+      "matchManagers": ["npm"],
+      "matchFileNames": ["frontend/package.json"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "React frontend minor and patch"
+    },
+    {
+      "description": "Group weekly Playwright E2E minor and patch updates",
+      "matchManagers": ["npm"],
+      "matchFileNames": ["e2e/package.json"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "Playwright E2E minor and patch"
+    },
+    {
+      "description": "Group weekly Docker base image updates",
+      "matchManagers": ["dockerfile"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "Docker base images"
+    }
+  ]
+}

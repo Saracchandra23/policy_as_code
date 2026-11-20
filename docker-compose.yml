@@ -1,0 +1,55 @@
+services:
+  opa-service:
+    build:
+      context: .
+      dockerfile: opa-service/Dockerfile
+    environment:
+      OPA_CONFIG_PATH: /app/config/opa-config.yaml
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/health"]
+      interval: 10s
+      timeout: 3s
+      start_period: 20s
+      retries: 5
+    networks:
+      - authzen-net
+
+  worker:
+    build:
+      context: .
+      dockerfile: worker/Dockerfile
+    environment:
+      OPA_SERVICE_URL: http://opa-service:8080
+      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN:-}
+    ports:
+      - "8787:8787"
+    depends_on:
+      opa-service:
+        condition: service_healthy
+    volumes:
+      - worker-state:/app/.wrangler
+    networks:
+      - authzen-net
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      target: development
+    environment:
+      VITE_PROXY_TARGET: http://worker:8787
+    ports:
+      - "5173:5173"
+    depends_on:
+      - worker
+    networks:
+      - authzen-net
+
+networks:
+  authzen-net:
+    driver: bridge
+
+volumes:
+  worker-state:

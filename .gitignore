@@ -5,3 +5,7 @@ dist/
 opa-service/bin/
 *.exe
 .DS_Store
+e2e/test-results/
+e2e/playwright-report/
+test-results/
+playwright-report/
