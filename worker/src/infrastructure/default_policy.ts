@@ -1,5 +1,4 @@
 export const DEFAULT_AUTHZ_POLICY = `package authz
-
 import rego.v1
 
 default allow := false
@@ -46,5 +45,4 @@ reasons contains msg if {
 reasons contains msg if {
 	not allow
 	msg := "authorization requirements were not met"
-}
-`.trim();
+}`.trim();

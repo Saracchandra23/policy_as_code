@@ -102,10 +102,7 @@ export class SqlitePolicyStorageAdapter implements PolicyStoragePort {
 
   async seedDefaultPolicyIfEmpty(rego: string): Promise<void> {
     const normalized = rego.trim();
-    if (!normalized.startsWith("package authz") || !normalized.includes("import rego.v1")) {
-      throw new Error("seed policy must begin with package authz and import rego.v1");
-    }
-    if (!hasRegoV1Headers(rego)) {
+    if (!hasRegoV1Headers(normalized)) {
       throw new Error("seed policy must begin with package authz and import rego.v1");
     }
     const existing = this.sql
