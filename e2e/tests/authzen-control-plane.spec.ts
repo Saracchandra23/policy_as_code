@@ -116,6 +116,13 @@ test.describe("OpenID AuthZEN control plane", () => {
     await expect
       .poll(async () => (await getState(request)).auditLogs.length)
       .toBeGreaterThan(initialState.auditLogs.length);
+    const refreshResponse = page.waitForResponse(
+      (response) =>
+        response.url().endsWith("/api/state") &&
+        response.request().method() === "GET",
+    );
+    await page.getByRole("button", { name: "Refresh state" }).click();
+    expect((await refreshResponse).status()).toBe(200);
     await expect(
       page.getByRole("table").getByRole("row").filter({ hasText: "bob / publish_report" }),
     ).toBeVisible();

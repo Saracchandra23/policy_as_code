@@ -28,7 +28,7 @@ export class DurableObjectContainerPDPAdapter implements AuthZenPDPPort {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(request),
     });
-    const result = await readJson<AccessEvaluationResponse>(response);
+    const result = await readJson<AccessEvaluationResponse>(response, "/access/v1/evaluation");
     if (!response.ok) {
       throw new Error(`OPA evaluation failed (${response.status}): ${JSON.stringify(result)}`);
     }
@@ -44,7 +44,7 @@ export class DurableObjectContainerPDPAdapter implements AuthZenPDPPort {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ rego: regoCode }),
     });
-    const result = await readJson<ValidateResponse>(response);
+    const result = await readJson<ValidateResponse>(response, "/validate");
     if (response.status >= 500) {
       throw new Error(`OPA validation failed (${response.status}): ${JSON.stringify(result)}`);
     }
@@ -66,7 +66,7 @@ export class DurableObjectContainerPDPAdapter implements AuthZenPDPPort {
         data: { metadata: { policy_version: version } },
       }),
     });
-    const result = await readJson<SyncResponse>(response);
+    const result = await readJson<SyncResponse>(response, "/policies/sync");
     if (!response.ok || result.synced !== true || typeof result.revision !== "string") {
       throw new Error(
         `OPA policy synchronization failed (${response.status}): ${JSON.stringify(result)}`,
@@ -76,7 +76,10 @@ export class DurableObjectContainerPDPAdapter implements AuthZenPDPPort {
 
   async getConfiguration(): Promise<AuthZenConfiguration> {
     const response = await this.request("/.well-known/authzen-configuration");
-    const configuration = await readJson<AuthZenConfiguration>(response);
+    const configuration = await readJson<AuthZenConfiguration>(
+      response,
+      "/.well-known/authzen-configuration",
+    );
     if (!response.ok) {
       throw new Error(`OPA discovery failed (${response.status}): ${JSON.stringify(configuration)}`);
     }
@@ -133,10 +136,21 @@ export class DurableObjectContainerPDPAdapter implements AuthZenPDPPort {
   }
 }
 
-async function readJson<T>(response: Response): Promise<T> {
-  const body: unknown = await response.json();
+async function readJson<T>(response: Response, endpoint: string): Promise<T> {
+  const text = await response.text();
+  let body: unknown;
+  try {
+    body = JSON.parse(text);
+  } catch (error) {
+    const contentType = response.headers.get("content-type") ?? "unknown content type";
+    const preview = text.replace(/\s+/g, " ").trim().slice(0, 160);
+    throw new Error(
+      `OPA container endpoint ${endpoint} returned non-JSON content (HTTP ${response.status}, ${contentType})${preview ? `: ${preview}` : ""}`,
+      { cause: error },
+    );
+  }
   if (body === null || typeof body !== "object") {
-    throw new Error("OPA returned a non-object JSON response");
+    throw new Error(`OPA container endpoint ${endpoint} returned a non-object JSON response`);
   }
   return body as T;
 }

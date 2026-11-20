@@ -20,6 +20,7 @@ export default function App({ client }: AppProps) {
   const [state, setState] = useState<ControlPlaneState | null>(null);
   const [configuration, setConfiguration] = useState<AuthZenConfiguration | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [stateError, setStateError] = useState<string | null>(null);
   const [configurationError, setConfigurationError] = useState<string | null>(null);
   const [lastDenial, setLastDenial] = useState<{
@@ -27,7 +28,8 @@ export default function App({ client }: AppProps) {
     response: EnforcementResult["response"];
   } | null>(null);
 
-  const refreshState = useCallback(async () => {
+  const refreshState = useCallback(async (showProgress = false) => {
+    if (showProgress) setRefreshing(true);
     try {
       setState(await client.getState());
       setStateError(null);
@@ -35,6 +37,7 @@ export default function App({ client }: AppProps) {
       setStateError(errorMessage(refreshError));
     } finally {
       setLoading(false);
+      if (showProgress) setRefreshing(false);
     }
   }, [client]);
 
@@ -72,9 +75,9 @@ export default function App({ client }: AppProps) {
           <span className="topbar-divider" />
           <span className="topbar-caption">OpenID AuthZEN · OPA · Cloudflare</span>
         </div>
-        <button className="refresh-button" onClick={() => void refreshState()} type="button" disabled={loading}>
-          <span className={loading ? "refresh-icon spinning" : "refresh-icon"}>↻</span>
-          <span>{loading ? "Loading" : "Refresh state"}</span>
+        <button className="refresh-button" onClick={() => void refreshState(true)} type="button" disabled={loading || refreshing}>
+          <span className={loading || refreshing ? "refresh-icon spinning" : "refresh-icon"}>↻</span>
+          <span>{loading ? "Loading" : refreshing ? "Refreshing state" : "Refresh state"}</span>
         </button>
       </header>
 
