@@ -1,25 +1,26 @@
+# Stage 1: Build Go OPA binary
 FROM golang:1.24-alpine AS builder
+WORKDIR /src
 
-ENV GOTOOLCHAIN=go1.26.0
-WORKDIR /src/opa-service
-
-COPY opa-service/go.mod opa-service/go.sum ./
+COPY go.mod go.sum ./
 RUN go mod download
 
-COPY opa-service/ ./
-RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /out/opa-service ./cmd/server
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -o /out/opa-server ./cmd/server
 
+# Stage 2: Minimal runtime image
 FROM alpine:3.20
-
-RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache ca-certificates wget
 WORKDIR /app
 
-COPY --from=builder /out/opa-service /usr/local/bin/opa-service
-COPY opa-service/config/opa-config.yaml ./config/opa-config.yaml
-COPY opa-service/policies/ ./policies/
+COPY --from=builder /out/opa-server /app/opa-server
+COPY config ./config
+COPY policies ./policies
 
 ENV OPA_CONFIG_PATH=/app/config/opa-config.yaml
 EXPOSE 8080
-HEALTHCHECK --interval=10s --timeout=3s --start-period=20s --retries=5 CMD wget -q -O /dev/null http://127.0.0.1:8080/health || exit 1
-USER 65532:65532
-ENTRYPOINT ["/usr/local/bin/opa-service"]
+
+HEALTHCHECK --interval=15s --timeout=3s --start-period=5s \
+  CMD wget -qO- http://127.0.0.1:8080/health || exit 1
+
+ENTRYPOINT ["/app/opa-server"]
