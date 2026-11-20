@@ -40,3 +40,9 @@ Log major prompts used with VS Code Copilot / Ollama during development (require
 ## 10. Docker Compose and Cloudflare Containers
 - Prompt: Finalize the repository with root-context Docker Compose orchestration for OPA, the Wrangler Worker, and Vite; native Cloudflare Container support through a Durable Object PDP adapter with HTTP fallback; configurable Playwright E2E base URL; Renovate grouping including Docker images; and a submission-ready README with local and Cloudflare quickstarts.
 - Added three Docker image targets, a shared Compose network and persistent local Worker state, a Compose-specific Wrangler config, and the optional Container-backed PDP adapter. Routed AuthZEN, Workflow validation, and policy activation through the Durable Object PDP port; extended E2E service selection and updated architecture/quickstart documentation.
+
+## 11. Live Deployment Documentation and PDP Discovery Fixes
+- Prompt: Finalize the submission with a Playwright E2E suite, weekly Renovate dependency and Docker image updates, Docker Compose local orchestration, native Cloudflare Container support, and a production deployment guide.
+- Prompt: Diagnose and fix the PDP discovery `Illegal invocation` and HTML response/JSON parsing failures in the deployed Worker and UI.
+- Prompt: Update `README.md` with the live Cloudflare Pages and Worker URLs, all Worker/AuthZEN and Go OPA endpoints, and update `PROMPTS.md` with the session prompts while preserving chronological history.
+- Bound the Worker HTTP PDP adapter's fetch function to `globalThis`, changed Worker discovery to advertise its own reachable AuthZEN endpoint rather than proxying upstream PDP metadata, and documented live deployment URLs, endpoint methods, and responsibilities.

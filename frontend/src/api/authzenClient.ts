@@ -36,6 +36,16 @@ export type {
 } from "../domain/policy";
 export type AuthZenClient = ControlPlaneApiPort;
 
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? "").trim().replace(/\/+$/, "");
+
+function resolveApiUrl(url: string): string {
+  if (/^https?:\/\//i.test(url)) {
+    return url;
+  }
+  const normalizedPath = url.startsWith("/") ? url : `/${url}`;
+  return API_BASE_URL ? `${API_BASE_URL}${normalizedPath}` : normalizedPath;
+}
+
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -54,7 +64,7 @@ export function createAuthZenClient(fetcher: typeof fetch = fetch): ControlPlane
     },
 
     async enforceAccess(request) {
-      const response = await fetcher("/api/pep/enforce", {
+      const response = await fetcher(resolveApiUrl("/api/pep/enforce"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(request),
@@ -121,7 +131,7 @@ async function requestJson(
   init?: RequestInit,
   acceptedStatuses: number[] = [200],
 ): Promise<unknown> {
-  const response = await fetcher(url, init);
+  const response = await fetcher(resolveApiUrl(url), init);
   if (!acceptedStatuses.includes(response.status)) {
     throw await responseError(response);
   }

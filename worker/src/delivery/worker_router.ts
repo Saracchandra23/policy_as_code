@@ -29,9 +29,11 @@ async function routeRequest(request: Request, env: Env): Promise<Response> {
   const pathname = url.pathname;
 
   if (request.method === "GET" && pathname === "/.well-known/authzen-configuration") {
-    return jsonResponse(
-      await policyEngineStub(env, "default").getPdpConfiguration(),
-    );
+    const accessEvaluationEndpoint = new URL("/access/v1/evaluation", url.origin).toString();
+    return jsonResponse({
+      policy_decision_point: url.origin,
+      access_evaluation_endpoint: accessEvaluationEndpoint,
+    });
   }
   if (request.method === "POST" && pathname === "/access/v1/evaluation") {
     const body = await readJson<unknown>(request);

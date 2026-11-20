@@ -1,6 +1,39 @@
 # AI-Assisted Policy-as-Code Control Plane
 
-**Live demo:** <ADD_CLOUDFLARE_PAGES_URL>
+**Live demo:** https://cf-ai-policy-as-code.pages.dev
+
+## Live Deployments & Endpoints
+
+- **Cloudflare Pages UI:** https://cf-ai-policy-as-code.pages.dev
+- **Cloudflare Worker Base URL:** https://cf-ai-policy-as-code.saracchandrac.workers.dev
+- **Go OPA PDP Container (Render):** https://cf-ai-opa-pdp.onrender.com
+
+Replace this URL with the public URL of your custom Render deployment or Hugging Face Space when using a different PDP host.
+
+### Worker API & AuthZEN endpoints
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `https://cf-ai-policy-as-code.saracchandrac.workers.dev/api/state` | Read active/candidate policies, versions, audit events, and chat history. |
+| `GET` | `https://cf-ai-policy-as-code.saracchandrac.workers.dev/.well-known/authzen-configuration` | Discover the Worker PDP and its access evaluation endpoint. |
+| `POST` | `https://cf-ai-policy-as-code.saracchandrac.workers.dev/access/v1/evaluation` | OpenID AuthZEN 1.0 authorization evaluation. |
+| `POST` | `https://cf-ai-policy-as-code.saracchandrac.workers.dev/api/pep/enforce` | Enforce a PEP decision and append an audit event. |
+| `POST` | `https://cf-ai-policy-as-code.saracchandrac.workers.dev/api/chat` | Explain a denial or start a policy-authoring workflow. |
+| `POST` | `https://cf-ai-policy-as-code.saracchandrac.workers.dev/api/policies/approve` | Approve a candidate policy and synchronize it to OPA. |
+| `GET` | `https://cf-ai-policy-as-code.saracchandrac.workers.dev/api/workflows/:id` | Read workflow status and authoring progress. |
+
+### Go OPA PDP endpoints
+
+These are available at the Go PDP base URL above; replace the host if deploying elsewhere.
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/health` | Container and service health check. |
+| `GET` | `/.well-known/authzen-configuration` | Go PDP AuthZEN discovery metadata. |
+| `POST` | `/access/v1/evaluation` | Evaluate an AuthZEN authorization request. |
+| `POST` | `/validate` | Validate candidate Rego policy. |
+| `POST` | `/policies/sync` | Synchronize policy and data into the bundle store. |
+| `GET` | `/bundle-server/bundles/bundle.tar.gz` | Download the active OPA bundle with ETag support. |
 
 `cf_ai_policy_as_code` is an authorization control plane for authoring, validating, reviewing, and activating Rego policies. The React control plane sends OpenID AuthZEN 1.0 requests through a Cloudflare Worker PEP. A Durable Object owns SQLite policy, chat, and decision state and selects either an in-process Cloudflare Container Go OPA PDP or an HTTP PDP. Cloudflare Workflows coordinate Workers AI generation, OPA validation, repair, and candidate persistence.
 

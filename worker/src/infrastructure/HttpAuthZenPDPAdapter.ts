@@ -19,12 +19,14 @@ interface SyncResponse {
 
 export class HttpAuthZenPDPAdapter implements AuthZenPDPPort {
   private readonly baseUrl: string;
+  private readonly fetcher: typeof fetch;
 
   constructor(
     opaServiceUrl: string,
-    private readonly fetcher: typeof fetch = fetch,
+    fetcher: typeof fetch = globalThis.fetch,
   ) {
     this.baseUrl = opaServiceUrl.replace(/\/+$/, "");
+    this.fetcher = fetcher.bind(globalThis);
   }
 
   async evaluate(request: AccessEvaluationRequest): Promise<AccessEvaluationResponse> {

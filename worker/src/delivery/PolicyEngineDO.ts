@@ -34,11 +34,6 @@ export class PolicyEngineDO extends DurableObject<Env> {
     return this.container.enforceAccess.execute(request);
   }
 
-  async getPdpConfiguration() {
-    await this.initialized;
-    return this.container.pdp.getConfiguration();
-  }
-
   async validatePolicy(regoCode: string) {
     await this.initialized;
     return this.container.pdp.validateRego(regoCode);
