@@ -1,5 +1,5 @@
 # Stage 1: Build Go OPA binary
-FROM golang:1.24-alpine AS builder
+FROM golang:1.26-alpine AS builder
 WORKDIR /src
 
 COPY go.mod go.sum ./
@@ -9,7 +9,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o /out/opa-server ./cmd/server
 
 # Stage 2: Minimal runtime image
-FROM alpine:3.20
+FROM alpine:3.23
 RUN apk add --no-cache ca-certificates wget
 WORKDIR /app
 
