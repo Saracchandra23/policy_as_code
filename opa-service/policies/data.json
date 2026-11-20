@@ -1,0 +1,7 @@
+{
+  "roles": {
+    "admin": ["read", "write", "delete", "read_report", "publish_report", "delete_workspace"],
+    "editor": ["read_report", "publish_report"],
+    "viewer": ["read", "read_report"]
+  }
+}

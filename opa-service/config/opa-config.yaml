@@ -1,0 +1,14 @@
+services:
+  bundle_server:
+    url: http://127.0.0.1:8080
+
+bundles:
+  authz:
+    service: bundle_server
+    resource: /bundle-server/bundles/bundle.tar.gz
+    polling:
+      min_delay_seconds: 1
+      max_delay_seconds: 5
+
+decision_logs:
+  console: true
