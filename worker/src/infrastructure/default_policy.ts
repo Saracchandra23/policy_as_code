@@ -47,4 +47,4 @@ reasons contains msg if {
 	not allow
 	msg := "authorization requirements were not met"
 }
-`;
+`.trim();

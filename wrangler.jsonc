@@ -1,5 +1,5 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
+  "$schema": "worker/node_modules/wrangler/config-schema.json",
   "name": "cf-ai-policy-as-code",
   "main": "worker/src/delivery/index.ts",
   "compatibility_date": "2026-11-01",
@@ -27,15 +27,7 @@
       "class_name": "PolicyAuthoringWorkflow"
     }
   ],
-  "containers": [
-    {
-      "class_name": "PolicyEngineDO",
-      "image": "./opa-service/Dockerfile",
-      "instance_type": "lite",
-      "max_instances": 2
-    }
-  ],
   "vars": {
-    "OPA_SERVICE_URL": "http://127.0.0.1:8080"
+    "OPA_SERVICE_URL": "https://cf-ai-opa-pdp.onrender.com"
   }
 }
